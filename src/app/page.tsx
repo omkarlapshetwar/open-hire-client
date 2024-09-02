@@ -1,91 +1,99 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import SearchForm from './components/developer_search.js/SearchForm';
-import DeveloperTable from './components/developer_search.js/DeveloperTable';
-import Spinner from './components/developer_search.js/Spinner';
-import { SearchCriteria, Developer, searchDevelopers } from './services/githubService';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import SignIn from './components/auth/SignIn';
+import SignUp from './components/auth/SignUp';
+import DeveloperSearch from './developer_search_screen/page';
+import ErrorDisplay from './components/common/ErrorDisplay';
+
+type AuthStatus = 'signIn' | 'signUp' | 'authenticated';
 
 export default function Home() {
-  const [developers, setDevelopers] = useState<Developer[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [page, setPage] = useState(1);
-  const [criteria, setCriteria] = useState<SearchCriteria>({});
-
-  const handleSearch = async (searchCriteria: SearchCriteria) => {
-    setIsLoading(true);
-    setHasSearched(true);
-    setCriteria(searchCriteria);
-    setPage(1);
-    try {
-      const results = await searchDevelopers({ ...searchCriteria, page: 1 });
-      setDevelopers(results);
-    } catch (error) {
-      console.error('Error searching developers:', error);
-      // Handle error state
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadMore = useCallback(async () => {
-    if (isLoading) return;
-    setIsLoading(true);
-    try {
-      const results = await searchDevelopers({ ...criteria, page: page + 1 });
-      setDevelopers(prev => [...prev, ...results]);
-      setPage(prev => prev + 1);
-    } catch (error) {
-      console.error('Error loading more developers:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [criteria, isLoading, page]);
+  const [authStatus, setAuthStatus] = useState<AuthStatus>('signIn');
+  const [token, setToken] = useState<string | null>(null);
+  const [globalError, setGlobalError] = useState<{ message: string; statusCode?: number } | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop ===
-        document.documentElement.offsetHeight
-      ) {
-        loadMore();
-      }
-    };
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+      setAuthStatus('authenticated');
+    }
+  }, []);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadMore]);
+  const handleSignIn = (newToken: string) => {
+    setToken(newToken);
+    setAuthStatus('authenticated');
+  };
+
+  const handleSignUp = (newToken: string) => {
+    setToken(newToken);
+    setAuthStatus('authenticated');
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setAuthStatus('signIn');
+  };
+
+  const handleError = (message: string, statusCode?: number) => {
+    setGlobalError({ message, statusCode });
+  };
 
   return (
-    <main className="min-h-screen p-4 bg-purple-100">
-      <motion.h1 
+    <main className="min-h-screen p-4 bg-gradient-to-br from-blue-100 via-white to-purple-100 flex flex-col items-center justify-center">
+      <ErrorDisplay error={globalError} onClose={() => setGlobalError(null)} />
+      
+      <motion.div 
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-4xl font-bold mb-8 text-purple-600 text-center"
+        className="text-center mb-12"
       >
-        Developer Search
-      </motion.h1>
+        <h1 className="text-5xl font-bold mb-2 text-gray-800">Developer Hub</h1>
+        <p className="text-xl text-gray-600">Connect, Collaborate, Create</p>
+      </motion.div>
       
-      <SearchForm onSearch={handleSearch} />
-      
-      {isLoading && developers.length === 0 ? (
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
-        </div>
-      ) : hasSearched && (
-        <>
-          <DeveloperTable developers={developers} />
-          {isLoading && (
-            <div className="text-center py-4">
-              <Spinner />
-              <p>Loading more...</p>
-            </div>
-          )}
-        </>
-      )}
+      <AnimatePresence mode="wait">
+        {authStatus === 'signIn' && (
+          <motion.div
+            key="signIn"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <SignIn onSignIn={handleSignIn} onSwitchToSignUp={() => setAuthStatus('signUp')} onError={handleError} />
+          </motion.div>
+        )}
+
+        {authStatus === 'signUp' && (
+          <motion.div
+            key="signUp"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <SignUp onSignUp={handleSignUp} onSwitchToSignIn={() => setAuthStatus('signIn')} onError={handleError} />
+          </motion.div>
+        )}
+
+        {authStatus === 'authenticated' && token && (
+          <motion.div
+            key="developerSearch"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-4xl"
+          >
+            <DeveloperSearch onSignOut={handleSignOut} token={token} onError={handleError} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }

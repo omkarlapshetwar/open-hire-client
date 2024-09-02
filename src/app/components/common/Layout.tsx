@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -12,7 +10,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </main>
       <footer className="bg-accent p-4 text-center text-white">
-        © 2023 Developer Search. All rights reserved.
+        © {new Date().getFullYear()} Developer Search. All rights reserved.
       </footer>
     </div>
   );

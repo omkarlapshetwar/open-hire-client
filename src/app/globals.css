@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 body {
-  @apply bg-background text-white;
+  @apply bg-background text-text-primary;
+}
+
+.glass {
+  @apply bg-white bg-opacity-80 backdrop-blur-lg;
 }
