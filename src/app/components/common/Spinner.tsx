@@ -1,9 +1,16 @@
 import React from 'react';
 
-const Spinner: React.FC = () => {
+interface SpinnerProps {
+  className?: string;
+  color?: 'white' | 'purple';
+}
+
+const Spinner: React.FC<SpinnerProps> = ({ className = '', color = 'purple' }) => {
+  const spinnerColor = color === 'white' ? 'border-white' : 'border-purple-600';
+
   return (
-    <div className="flex justify-center items-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+    <div className={`flex justify-center items-center ${className}`}>
+      <div className={`animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 ${spinnerColor}`}></div>
     </div>
   );
 };

@@ -8,7 +8,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*', // Adjust this to your backend URL
+        destination: 'https://a958-2401-4900-1c97-3f32-4146-f185-7352-7481.ngrok-free.app/api/:path*',
       },
     ];
   },

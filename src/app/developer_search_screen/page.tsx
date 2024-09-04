@@ -22,7 +22,6 @@ const DeveloperSearch: React.FC<DeveloperSearchProps> = ({ onSignOut, token, onE
   const [criteria, setCriteria] = useState<SearchCriteria>({});
 
   useEffect(() => {
-    // Load saved results from localStorage on component mount
     const savedResults = localStorage.getItem('lastSearchResults');
     if (savedResults) {
       setDevelopers(JSON.parse(savedResults));
@@ -78,34 +77,34 @@ const DeveloperSearch: React.FC<DeveloperSearchProps> = ({ onSignOut, token, onE
           </button>
         </div>
         
-        <SearchForm onSearch={handleSearch} />
+        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
         
         <AnimatePresence>
-          {isLoading && developers.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex justify-center items-center h-64"
-            >
-              <Spinner />
-            </motion.div>
-          ) : hasSearched && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <DeveloperList developers={developers} lastDeveloperRef={lastDeveloperRef} />
-              {isLoading && (
-                <div className="text-center py-4">
-                  <Spinner />
-                  <p className="mt-2 text-gray-600">Loading more developers...</p>
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isLoading && developers.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center items-center h-64"
+          >
+            <Spinner color="purple" className="h-12 w-12" />
+          </motion.div>
+        ) : hasSearched && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <DeveloperList developers={developers} lastDeveloperRef={lastDeveloperRef} />
+            {isLoading && (
+              <div className="text-center py-4">
+                <Spinner color="purple" className="h-8 w-8 mx-auto" />
+                <p className="mt-2 text-gray-600">Loading more developers...</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
       </div>
     </div>
   );

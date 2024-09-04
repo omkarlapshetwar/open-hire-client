@@ -6,7 +6,11 @@ interface ContributionsListProps {
   contributions: Contribution[];
 }
 
-const ContributionsList: React.FC<ContributionsListProps> = ({ contributions }) => {
+const ContributionsList: React.FC<ContributionsListProps> = ({ contributions = [] }) => {
+  if (!Array.isArray(contributions)) {
+    return <p className="text-gray-600">No contribution data available.</p>;
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold mb-4 text-purple-700">Contributed Repositories</h2>

@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Developer } from '../../types/github';
-import DeveloperAvatar from './DeveloperAvatar';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface DeveloperListProps {
   developers: Developer[];
   lastDeveloperRef: (node: HTMLElement | null) => void;
 }
 
-const DeveloperList: React.FC<DeveloperListProps> = React.memo(({ developers, lastDeveloperRef }) => {
+const DeveloperList: React.FC<DeveloperListProps> = ({ developers, lastDeveloperRef }) => {
   return (
     <ul className="space-y-4">
       {developers.map((developer, index) => (
@@ -22,17 +23,21 @@ const DeveloperList: React.FC<DeveloperListProps> = React.memo(({ developers, la
         >
           <div className="flex items-center">
             <div className="flex-shrink-0 mr-4">
-              <DeveloperAvatar login={developer.login} avatarUrl={developer.avatar_url} />
+              <Image
+                src={developer.avatar_url}
+                alt={`${developer.login}'s avatar`}
+                width={64}
+                height={64}
+                className="rounded-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = `https://ui-avatars.com/api/?name=${developer.login}&background=random`;
+                }}
+              />
             </div>
             <div className="flex-grow">
-              <a 
-                href={developer.html_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-xl font-semibold text-purple-700 hover:underline"
-              >
-                {developer.login}
-              </a>
+              <h2 className="text-xl font-semibold text-purple-700">{developer.login}</h2>
               <p className="text-gray-600">{developer.location || 'Location not specified'}</p>
               <div className="mt-2 flex flex-wrap gap-4">
                 <span className="text-sm text-gray-500">Repos: {developer.public_repos}</span>
@@ -41,21 +46,16 @@ const DeveloperList: React.FC<DeveloperListProps> = React.memo(({ developers, la
                 <span className="text-sm text-gray-500">Current Company: N/A</span>
               </div>
             </div>
-            <a
-              href={`/dashboard/${developer.login}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-4 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors duration-300"
-            >
-              View Dashboard
-            </a>
+            <Link href={`/dashboard/${developer.login}`} className="ml-4">
+              <button className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors duration-300">
+                View Dashboard
+              </button>
+            </Link>
           </div>
         </motion.li>
       ))}
     </ul>
   );
-});
-
-DeveloperList.displayName = 'DeveloperList';
+};
 
 export default DeveloperList;

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Developer } from '../../types/github';
 import Image from 'next/image';
+import { FaMapMarkerAlt, FaLink } from 'react-icons/fa';
 
 interface ProfileCardProps {
   profile: Developer | null;
@@ -12,8 +13,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
 
   return (
     <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="bg-white rounded-lg shadow-lg p-6"
     >
@@ -31,7 +32,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
         </div>
       </div>
       {profile.bio && <p className="text-gray-700 mb-4">{profile.bio}</p>}
-      <div className="grid grid-cols-2 gap-4">
+      {profile.location && (
+        <p className="flex items-center text-gray-600 mb-2">
+          <FaMapMarkerAlt className="mr-2" /> {profile.location}
+        </p>
+      )}
+      {profile.blog && (
+        <p className="flex items-center text-gray-600 mb-2">
+          <FaLink className="mr-2" /> 
+          <a href={profile.blog} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            {profile.blog}
+          </a>
+        </p>
+      )}
+      <div className="grid grid-cols-2 gap-4 mt-4">
         <div>
           <p className="text-gray-600">Followers</p>
           <p className="text-xl font-bold">{profile.followers}</p>
@@ -45,8 +59,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
           <p className="text-xl font-bold">{profile.public_repos}</p>
         </div>
         <div>
-          <p className="text-gray-600">Location</p>
-          <p className="text-xl font-bold">{profile.location || 'N/A'}</p>
+          <p className="text-gray-600">Public Gists</p>
+          <p className="text-xl font-bold">{profile.public_gists}</p>
         </div>
       </div>
     </motion.div>

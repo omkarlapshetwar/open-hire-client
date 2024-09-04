@@ -1,65 +1,62 @@
-import axios, { AxiosError } from 'axios';
-import { SearchCriteria, Developer, Repository, Contribution } from '../types/github';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-
-const api = axios.create({
-  baseURL: API_URL,
-});
-
-// Add a request interceptor to set the Authorization header
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-});
-
-const handleApiError = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError<{ message: string }>;
-    throw new Error(axiosError.response?.data?.message || 'An unexpected error occurred');
-  }
-  throw error;
-};
+import ApiService from './apiService';
+import { SearchCriteria, Developer, Repository, Contribution, DeveloperStats } from '../types/github';
 
 export const searchDevelopers = async (criteria: SearchCriteria): Promise<Developer[]> => {
   try {
-    const response = await api.post<Developer[]>('/external-contributors', criteria);
+    const response = await ApiService.post('/api/external-contributors', criteria);
     return response.data;
   } catch (error) {
     console.error('Error searching developers:', error);
-    throw handleApiError(error);
+    throw error;
   }
 };
 
 export const getDeveloperProfile = async (username: string): Promise<Developer> => {
   try {
-    const response = await api.get<Developer>(`/developer-profile/${username}`);
+    const response = await ApiService.get(`/api/developer-profile/${username}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching developer profile:', error);
-    throw handleApiError(error);
+    throw error;
   }
 };
 
 export const getDeveloperRepos = async (username: string): Promise<Repository[]> => {
   try {
-    const response = await api.get<Repository[]>(`/developer-repos/${username}`);
+    const response = await ApiService.get(`/api/developer-repos/${username}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching developer repos:', error);
-    throw handleApiError(error);
+    throw error;
   }
 };
 
 export const getDeveloperContributions = async (username: string): Promise<Contribution[]> => {
   try {
-    const response = await api.get<Contribution[]>(`/developer-contributions/${username}`);
+    const response = await ApiService.get(`/api/developer-contributions/${username}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching developer contributions:', error);
-    throw handleApiError(error);
+    throw error;
+  }
+};
+
+export const getRepoPRs = async (username: string, owner: string, repo: string): Promise<any[]> => {
+  try {
+    const response = await ApiService.get(`/api/repo-prs/${username}/${owner}/${repo}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching repo PRs:', error);
+    throw error;
+  }
+};
+
+export const getDeveloperStats = async (username: string): Promise<DeveloperStats> => {
+  try {
+    const response = await ApiService.get(`/api/developer-stats/${username}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching developer stats:', error);
+    throw error;
   }
 };

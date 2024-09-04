@@ -7,7 +7,11 @@ interface ContributionsChartProps {
   contributions: Contribution[];
 }
 
-const ContributionsChart: React.FC<ContributionsChartProps> = ({ contributions }) => {
+const ContributionsChart: React.FC<ContributionsChartProps> = ({ contributions = [] }) => {
+  if (!Array.isArray(contributions)) {
+    return <p className="text-gray-600">No contribution data available.</p>;
+  }
+
   const chartData = contributions.slice(0, 10).map(contribution => ({
     name: contribution.repo.split('/')[1] || contribution.repo,
     contributions: contribution.count

@@ -5,7 +5,7 @@ class ApiService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: 'http://localhost:5000', // Replace with your API base URL
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
     });
 
     this.api.interceptors.request.use((config) => {

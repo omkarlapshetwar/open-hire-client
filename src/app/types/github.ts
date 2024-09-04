@@ -1,10 +1,12 @@
 export interface SearchCriteria {
+    q?: string;
     location?: string;
     language?: string;
     followers?: number;
     repos?: number;
     topics?: string[];
     page?: number;
+    perPage?: number;
   }
   
   export interface Developer {
@@ -15,9 +17,11 @@ export interface SearchCriteria {
     html_url: string;
     bio: string | null;
     public_repos: number;
+    public_gists: number;
     followers: number;
     following: number;
     location: string | null;
+    blog: string | null;
     created_at: string;
   }
   
@@ -38,9 +42,17 @@ export interface SearchCriteria {
     html_url: string;
     count: number;
   }
-
-  export interface Contribution {
-    repo: string;
-    count: number;
-    html_url: string;
+  
+  export interface DeveloperStats {
+    totalContributions: number;
+    longestStreak: number;
+    contributionCalendar: {
+      day: string;
+      value: number;
+    }[];
+    averageCommitFrequency: number;
+    codeReviewParticipation: number;
+    pullRequestMergeRatio: number;
+    organizationsContributedTo: number;
+    openSourceProjectsContributedTo: number;
   }
